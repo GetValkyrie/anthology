@@ -7,13 +7,26 @@ VAGRANTFILE_API_VERSION = '2'
 Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   config.vm.box = 'hashicorp/precise64'
 
-  config.vm.network 'forwarded_port', guest: 10022, host: 10022
-  config.vm.network 'forwarded_port', guest: 10080, host: 10080
-
-  config.vm.provision "docker" do |docker|
-    docker.pull_images 'sameersbn/gitlab:7.1.0'
-
-    docker.run 'sameersbn/gitlab:7.1.0',
-      args: "--name=gitlab -d -p 10022:22 -p 10080:80 -e 'GITLAB_PORT=10080' -e 'GITLAB_SSH_PORT=10022'"
+  config.vm.provision :puppet do |puppet|
+    puppet.options = ['--verbose']
   end
+
+  config.vm.provision 'docker' do |docker|
+    docker.pull_images 'sameersbn/postgresql:latest'
+    docker.run 'sameersbn/postgresql:latest',
+      args: '--name=postgresql ' +
+            '-v /opt/postgresql/data:/var/lib/postgresql '
+  end
+
+  #config.vm.provision 'docker' do |docker|
+    #docker.pull_images 'sameersbn/gitlab:7.1.0'
+    #docker.run 'sameersbn/gitlab:7.1.0',
+      #args: '--name=gitlab ' +
+            #'-v /vagrant/gitlab/data:/home/git/data ' +
+            #'-p 10022:22 -p 10080:80 ' +
+            #"-e 'GITLAB_PORT=10080' -e 'GITLAB_SSH_PORT=10022'"
+  #end
+
+  #config.vm.network 'forwarded_port', guest: 10022, host: 10022
+  #config.vm.network 'forwarded_port', guest: 10080, host: 10080
 end
