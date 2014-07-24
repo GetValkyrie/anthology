@@ -5,7 +5,7 @@
 VAGRANTFILE_API_VERSION = '2'
 
 Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
-  config.vm.define "host" do |host|
+  config.vm.define "docker-host" do |host|
     host.vm.box = "hashicorp/precise64"
     host.vm.provision :puppet do |puppet|
       puppet.options = ['--verbose']
@@ -24,7 +24,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   # Ensure that the Docker provider uses our host maching.
   config.vm.provider "docker" do |d|
     d.vagrant_vagrantfile = './Vagrantfile'
-    d.vagrant_machine = 'host'
+    d.vagrant_machine = 'docker-host'
     d.force_host_vm = true
   end
 
