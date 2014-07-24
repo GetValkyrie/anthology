@@ -10,8 +10,10 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
     host.vm.provision :puppet do |puppet|
       puppet.options = ['--verbose']
     end
-    host.vm.provision 'docker' do |docker|
-      # This is just a convenient way to install docker on the host.
+    host.vm.provision 'docker' do |d|
+      # This is a convenient way to install docker on the host. It also allows
+      # us to initialize images.
+      #d.images = ['smerrill/vagrant-ubuntu-puppet']
     end
     # Port-forwarding to the gitlab container
     host.vm.network 'forwarded_port', guest: 10022, host: 11022
@@ -48,7 +50,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 
       # Ensure Vagrant knows the SSH port. See
       # https://github.com/mitchellh/vagrant/issues/3772.
-      override.gitlab.ssh.port = 10022
+      #override.gitlab.ssh.port = 10022
     end
     gitlab.vm.provision :puppet do |puppet|
       puppet.options = ['--verbose']
@@ -56,6 +58,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   end
 
   config.vm.define "kibana" do |container|
+    container.vm.hostname = 'kibana'
     container.vm.provider 'docker' do |d|
       d.image = 'smerrill/vagrant-ubuntu-puppet'
       d.name = 'kibana'
