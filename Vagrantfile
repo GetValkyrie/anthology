@@ -55,4 +55,24 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
     end
   end
 
+  config.vm.define "kibana" do |container|
+    container.vm.provider 'docker' do |d|
+      d.image = 'smerrill/vagrant-ubuntu-puppet'
+      d.name = 'kibana'
+      #d.volumes = ['/vagrant/gitlab/data:/home/git/data']
+      #d.ports = ['10022:22', '10080:80']
+      #d.env = { 'GITLAB_PORT' => '10080', 'GITLAB_SSH_PORT' => '10022' }
+      d.has_ssh = true
+
+      # Ensure Vagrant knows the SSH port. See
+      # https://github.com/mitchellh/vagrant/issues/3772.
+      #override.host.ssh.port = 10022
+    end
+    container.vm.provision :puppet do |puppet|
+      puppet.options = ['--verbose']
+      puppet.manifest_file = 'nodes.pp'
+      puppet.module_path = 'modules/'
+    end
+  end
+
 end

@@ -1,0 +1,35 @@
+<VirtualHost *:80>
+    DocumentRoot <%= @config_dir %>
+    ServerName   <%= @server_name %>
+
+    ErrorLog  <% if @log_dir %><%= @log_dir %><% else %><%= @log_dir_apache %><% end %>/error.log
+    CustomLog <% if @log_dir %><%= @log_dir %><% else %><%= @log_dir_apache %><% end %>/access.log combined
+    LogLevel warn
+
+    # Set global proxy timeouts
+    <Proxy <%= @elasticsearch_protocol -%>://<%= @elasticsearch_host %>:<%= @elasticsearch_port %>>
+        ProxySet connectiontimeout=5 timeout=90
+    </Proxy>
+
+    # Proxy for _aliases and .*/_search
+    <LocationMatch "^(/_aliases|.*/_search)$">
+        ProxyPassMatch   <%= @elasticsearch_protocol -%>://<%= @elasticsearch_host %>:<%= @elasticsearch_port %>
+        ProxyPassReverse <%= @elasticsearch_protocol -%>://<%= @elasticsearch_host %>:<%= @elasticsearch_port %>
+    </LocationMatch>
+
+    # Proxy for kibana-int/{dashboard,temp} stuff (if you don't want auth on /
+    # then you will want these to be protected)
+    <LocationMatch "^(/kibana-int/dashboard/|/kibana-int/temp).*$">
+        ProxyPassMatch   <%= @elasticsearch_protocol -%>://<%= @elasticsearch_host %>:<%= @elasticsearch_port %>
+        ProxyPassReverse <%= @elasticsearch_protocol -%>://<%= @elasticsearch_host %>:<%= @elasticsearch_port %>
+    </LocationMatch>
+
+    <Directory <%= @config_dir %>>
+        Options None
+        AllowOverride None
+        Order allow,deny
+        allow from all
+        Options -MultiViews
+    </Directory>
+</VirtualHost>
+
