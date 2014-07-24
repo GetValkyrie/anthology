@@ -45,6 +45,9 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
       d.ports = ['10022:22', '10080:80']
       d.env = { 'GITLAB_PORT' => '10080', 'GITLAB_SSH_PORT' => '10022' }
     end
+    gitlab.vm.provision :puppet do |puppet|
+      puppet.options = ['--verbose']
+    end
   end
 
 end
