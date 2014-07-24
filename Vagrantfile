@@ -39,11 +39,16 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 
   config.vm.define "gitlab" do |gitlab|
     gitlab.vm.provider 'docker' do |d|
-      d.image = 'sameersbn/gitlab:7.1.0'
+      d.image = 'smerrill/vagrant-ubuntu-puppet'
       d.name = 'gitlab'
       d.volumes = ['/vagrant/gitlab/data:/home/git/data']
       d.ports = ['10022:22', '10080:80']
       d.env = { 'GITLAB_PORT' => '10080', 'GITLAB_SSH_PORT' => '10022' }
+      d.has_ssh = true
+
+      # Ensure Vagrant knows the SSH port. See
+      # https://github.com/mitchellh/vagrant/issues/3772.
+      override.gitlab.ssh.port = 10022
     end
     gitlab.vm.provision :puppet do |puppet|
       puppet.options = ['--verbose']
