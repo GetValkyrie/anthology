@@ -6,7 +6,7 @@ VAGRANTFILE_API_VERSION = '2'
 
 Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   config.vm.define "docker-host" do |host|
-    host.vm.box = "hashicorp/precise64"
+    host.vm.box = "ubuntu/trusty64"
     host.vm.provision :puppet do |puppet|
       puppet.options = ['--verbose']
     end
